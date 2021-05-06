@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Inscription</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script type="text/javascript"></script>
+  <link rel="icon" type="image/png" href="GeoRDV.png"></link>
+  <script src="js/bootstrap.min.js"></script>
+
+</head>
+<body style="min-height:100vh;display:flex;flex-direction:column;">
+  <div class="pos-f-t sticky-top">
+    <nav class="navbar navbar-dark bg-dark">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <h3 style="color: white;">GeoRDV</h3>
+    </nav>
+    <ul class="navbar-nav mr-auto">
+    <div class="collapse" id="navbarToggleExternalContent">
+      <div class="bg-dark p-4">
+      			<li class="nav-item active">
+	        		<a class="nav-link disabled" href="index.html">Accueil</a>
+	      		</li>
+        		<script type="text/javascript">
+		        	if (document.cookie.indexOf('token') == -1) {
+		        	var balisage = "<li class='nav-item active'><a class='nav-link disabled' href='login.html'>Connexion</a></li><li class='nav-item active'><a class='nav-link disabled' href='register.html'>Inscription</a></li>";
+		        	document.write(balisage);
+		        	}else{
+		        	var balisage = "<li><a class='nav-link disabled' href='user.html'>Gérer les rendez-vous</a></li><li><a class='nav-link disabled' href=''>Deconnexion</a></li>";
+		        	document.write(balisage);
+		        	}
+	          	</script>
+      </div>
+      </ul>
+    </div>
+  </div>
+
+<div class="m-5">
+  <h3 class="text-center my-5">Inscrivez-vous</h3>
+
+    <form class="border p-5">
+      <div class="form-group">
+          <div class="row">
+            <div class="col-md-6">
+              <label for="nom">Nom</label>
+              <input id="nom" class="form-control" type="text" name="" placeholder="Entrer votre nom">
+            </div>
+            <div class="col-md-6">
+              <label for="prenom">Prénom</label>
+              <input id="prenom" class="form-control" type="text" name="" placeholder="Entrer votre prénom">
+            </div>
+          </div>
+      </div>
+      <div class="form-group">
+          <div class="row">
+            <div class="col-md-6">
+              <label for="login">Identifiant</label>
+              <input id="login" class="form-control" type="text" name="" placeholder="Entrer votre identifiant">
+            </div>
+            <div class="col-md-6">
+              <label for="mdp">Mot de passe</label>
+              <input id="mdp" class="form-control" type="password" name="" placeholder="Entrer votre mot de passe">
+            </div>
+          </div>
+      </div>
+      <div class="form-group">
+          <div class="form-group">
+          <div class="row">
+            <div class="col-md-12">
+              <label for="adresse">Adresse</label>
+              <input id="adresse" class="form-control" type="text" name="" placeholder="Entrer votre adresse">
+            </div>
+          </div>
+      </div>
+      <div class="form-group">
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-6">
+              <label for="cp">Code Postale</label>
+              <input id="cp" class="form-control" type="text" name="" placeholder="Entrer votre code postale">
+            </div>
+            <div class="col-md-6">
+              <label for="ville">Ville</label>
+              <input id="ville" class="form-control" type="text" name="" placeholder="Entrer votre ville">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="form-group">
+          <div class="form-group">
+          <div class="row">
+            <div class="col-md-12">
+              <label for="tel">Telephone</label>
+              <input id="tel" class="form-control" type="text" name="" placeholder="Entrer votre numero de telephone">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-group">
+          <div class="form-group">
+          <div class="row">
+            <div class="col-md-12">
+              <input id="conditionUti" type="checkbox" name="">
+              <label for="conditionUti">J'accepte les <a href="conditions.html" target="_blank">Conditions d'utilisation</a></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-danger" role="alert" id="message" style="display: none">
+        Veuillez cocher la case des conditions d'utilisation !
+      </div>
+
+      <button type="button" id="boutonConnexion" class="btn btn-primary">S'inscrire</button>
+    </form>
+
+<script>
+  //document.getElementById('message').style.display = 'none';
+  $(document).ready(function() {
+    $("#boutonConnexion").click(function() {
+      if (!document.getElementById('conditionUti').checked){
+        document.getElementById('message').style.display = 'block';
+      }else{
+        $.ajax({
+            type: "post",
+            url:  "http://172.19.0.39/RDV%20M%c3%a9dicaux/index.php?action=inscription",
+            dataType : "json",
+            contentType : "application/json",
+            data: JSON.stringify({
+                'nom' : $("#nom").val(),
+                'prenom' : $("#prenom").val(),
+                'login' : $("#login").val(),
+                'motdepasse' : $("#mdp").val(),
+                'adresse' : $("#adresse").val(),
+                'cp' : $("#cp").val(),
+                'ville' : $("#ville").val(),
+                'tel' : $("#tel").val(),
+                }), 
+            success: function(data){
+                
+                document.location.href="login.html";
+                $("#resultat").css("color", "green").html('Vous avez été inscrit avec succès !');
+            },
+          error: function(resultat, statut, erreur){
+            alert("error");
+          }
+        });
+      }
+    });
+  });
+  //window.open('conditions.html', '_blank');
+</script>
+    </div>
+</body>
+</html>

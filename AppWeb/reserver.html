@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Réserservation</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="CSS/style.css">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script type="text/javascript"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <link rel="icon" type="image/png" href="GeoRDV.png"></link>
+
+</head>
+<body style="min-height:100vh;display:flex;flex-direction:column;">
+  <div class="pos-f-t sticky-top">
+    <nav class="navbar navbar-dark bg-dark">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <h3 style="color: white;">GeoRDV</h3>
+    </nav>
+    <ul class="navbar-nav mr-auto">
+    <div class="collapse" id="navbarToggleExternalContent">
+      <div class="bg-dark p-4">
+      			<li class="nav-item active">
+	        		<a class="nav-link disabled" href="index.html">Accueil</a>
+	      		</li>
+        		<script type="text/javascript">
+		        	if (document.cookie.indexOf('token') == -1) {
+		        	var balisage = "<li class='nav-item active'><a class='nav-link disabled' href='login.html'>Connexion</a></li><li class='nav-item active'><a class='nav-link disabled' href='register.html'>Inscription</a></li>";
+		        	document.write(balisage);
+		        	}else {
+		        	var balisage = "<li><a class='nav-link disabled' href='user.html'>Gérer les rendez-vous</a></li><li><a class='nav-link disabled' onclick='deleteCookie()' href='index.html'>Deconnexion</a></li>";
+		        	document.write(balisage);
+		        	}
+	          	</script>
+      </div>
+      </ul>
+    </div>
+  </div>
+
+<div class="m-5">
+  <h3 class="text-center my-5">Réservation d'un rendez-vous</h3>
+
+  <form class="border p-5" method="POST">
+  	<label class="medecin">MEDECIN : </label>
+  	<input type="text" id="nom" disabled="disabled"></input>
+  	<script type="text/javascript">
+  		var medecin = "";
+        if (localStorage.getItem('idMedecin')){
+          medecin = localStorage.getItem('idMedecin');
+          //console.log(localStorage.getItem('idMedecin'));
+        }
+
+  		$.ajax({
+	    	url : 'https://data.issy.com/api/records/1.0/search/?dataset=medecins-generalistes-et-infirmiers&rows=100', // La ressource ciblée
+	    	type : 'GET', 										  // Le type de la requête HTTP
+	    	dataType : 'json', 									  // Le type de données à recevoir
+
+	    	success : function(data, textStatut, jqXHR){
+	    		var data_length = Object.keys(data.records).length;
+				for (var i = 0; i < data_length; i++) {
+					if (data["records"][i]["recordid"] === medecin) {
+						document.getElementById("nom").value = data["records"][i]["fields"]["nom"] + " " + data["records"][i]["fields"]["prenom"];
+					}
+				}
+	    	},
+
+	    	error : function(resultat, statut, erreur){
+	    		alert("t'es dans la merde");
+	    	}
+	    });
+
+  	</script>
+    <div class="form-group">
+        <div class="row">
+          <div class="col-md-6">
+            <label for="heure">Heure</label>
+            <input id="heure" class="form-control" type="time">
+          </div>
+          <div class="col-md-6">
+            <label for="date">Date</label>
+            <input id="date" class="form-control" type="date">
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" type="button" onclick="save()" name="OK">Enregistrer</button>
+      
+      <script type="text/javascript">
+        //var medecin = window.location.search.replace("?idMedecin=", "");
+
+        if(document.cookie.search("token") === -1){
+          document.location.href = "login.html";
+        }
+        function save(){
+        	var d = new Date();
+
+	        	var dateHeureRDV = $("#date").val() + " " + $("#heure").val();
+		        var url = "http://172.19.0.39/RDV%20Médicaux/index.php?action=rdv";
+	            dateHeureRDV = dateHeureRDV.replace("/", "-");
+	            $.ajax({
+		            url : url,
+		            type : 'POST',
+		            dataType : "json",
+		            contentType : "application/json",
+		            data: JSON.stringify({
+		                 'dateHeureRDV' : dateHeureRDV,
+		                 'token' : getCookie("token"),
+		                 'idMedecin' : medecin
+		                }), 
+		            success: function(data, textStatut, jqXHR){
+		                alert("Ajout d'un RDV réussi!");
+		                document.location.href="http://172.19.0.39/AppWeb/";
+		            },
+		          	error: function(resultat, statut, erreur){
+			            alert(resultat["responseJSON"]["message"]);
+		          	}
+		       	});
+	        	//Impossible d'ajouter le rendez-vous : date saisie supérieur à la date actuelle
+        }
+
+        function getCookie(name){
+           	var stringName = "";
+			var stringValue = "";
+			var token = "";
+			cookieValue = document.cookie.split('; ');
+			for (let i=0; i < cookieValue.length; i++) {
+				//console.log(i);
+				stringName = cookieValue[i].split('=')[0];
+				stringValue = cookieValue[i].split("=")[1];
+				//console.log("Name : "+stringName+" Value : " + stringValue);
+				if (stringName == name){
+					token = stringValue;
+				}
+			}
+           return token;
+        }
+
+        function deleteCookie() { 
+    	    document.cookie="token=;max-age=0;path=/";
+    			alert('Vous êtes déconnecté');
+    		}
+		
+      </script>
+
+    </form>
+    </div>
+</body>
+</html>

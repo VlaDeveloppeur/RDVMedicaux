@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Connexion</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <link rel="icon" type="image/png" href="GeoRDV.png"></link>
+  <script type="text/javascript"></script>
+  <script src="js/bootstrap.min.js"></script>
+  
+</head>
+<body style="min-height:100vh;display:flex;flex-direction:column;">
+<div class="pos-f-t sticky-top">
+    <nav class="navbar navbar-dark bg-dark">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <h3 style="color: white;">GeoRDV</h3>
+    </nav>
+    <ul class="navbar-nav mr-auto">
+    <div class="collapse" id="navbarToggleExternalContent">
+      <div class="bg-dark p-4">
+      			<li class="nav-item active">
+	        		<a class="nav-link disabled" href="index.html">Accueil</a>
+	      		</li>
+        		<script type="text/javascript">
+		        	if (document.cookie.indexOf('token') == -1) {
+		        	var balisage = "<li class='nav-item active'><a class='nav-link disabled' href='login.html'>Connexion</a></li><li class='nav-item active'><a class='nav-link disabled' href='register.html'>Inscription</a></li>";
+		        	document.write(balisage);
+		        	}else {
+		        	var balisage = "<li><a class='nav-link disabled' href='user.html'>Gérer les rendez-vous</a></li><li><a class='nav-link disabled' href=''>Deconnexion</a></li>";
+		        	document.write(balisage);
+		        	}
+	          	</script>
+      </div>
+  </ul>
+    </div>
+  </div>
+
+
+
+<div class="m-5">
+  <h3 class="text-center my-5">Connectez-vous</h3>
+
+    <form class="border p-5">
+      <div class="form-group">
+          <div class="row">
+            <div class="col-md-6">
+              <label for="login">Identifiant</label>
+              <input id="login" class="form-control" type="text" name="" placeholder="Entrer votre identifiant">
+            </div>
+            <div class="col-md-6">
+              <label for="mdp">Mot de passe</label>
+              <input id="mdp" class="form-control" type="password" name="" placeholder="Entrer votre mot de passe">
+            </div>
+          </div>
+      </div>
+      
+      <button type="button" id="boutonConnexion" class="btn btn-primary">Se connecter</button> <br> <br>
+      <a href="register.html"> Inscrivez-vous!</a>
+    </form>
+<script>
+    $(document).ready(function() {
+    $("#boutonConnexion").click(function() {
+    $.ajax({
+        type: "post",
+        url:  "http://172.19.0.39/RDV%20M%c3%a9dicaux/index.php?action=connexion",
+        dataType : "json",
+        contentType : "application/json",
+        data: JSON.stringify({
+            'login' : $("#login").val(),
+            'motdepasse' : $("#mdp").val()
+            }), 
+        success: function(data){
+            document.location.href="index.html";
+            $("#resultat").css("color", "green").html('Vous avez été connecté avec succès !');
+            var ladate = new Date();
+            if (document.cookie.search('cookieConsent') == -1){ // Si il n'existe pas
+              document.cookie = "token=" + data["token"] + ";expires=Session;path=/";
+            }else{
+              ladate = new Date(ladate.getTime() + 1000*60*60*24*365);
+              document.cookie = "token=" + data["token"] + ";expires=" + ladate.toGMTString() + ";path=/";
+            }
+        },
+      error: function(resultat, statut, erreur){
+        alert("Identifiant ou mot de passe incorrect");
+      }
+    });
+    });
+});
+</script>
+    </div>
+</body>
+</html>
